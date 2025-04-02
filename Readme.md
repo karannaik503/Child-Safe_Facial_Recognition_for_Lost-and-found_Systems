@@ -142,7 +142,7 @@ CHILD_SAFE_RECOGNITION_YOLOV8/
 
 ```bash
 git clone https://github.com/karannaik503/Child-Safe_Facial_Recognition_for_Lost-and-found_Systems.git
-cd CHILD_SAFE_RECOGNITION_YOLOV8
+cd Child-Safe_Facial_Recognition_for_Lost-and-found_Systems
 ```
 
 2. **Create and activate virtual environment**:
