@@ -165,7 +165,7 @@ mysql -u root -p
 CREATE DATABASE child_safety;
 USE child_safety;
 ```
-5. **Create Children_Metadata table manually, just in-case there's an error in creation of the table while runing the scripts(optional)**:
+5. **Create Children_Metadata table manually, just in-case there's an error in creation of the table while running the scripts(optional)**:
 
 ```bash
 CREATE TABLE IF NOT EXISTS Children_Metadata (
