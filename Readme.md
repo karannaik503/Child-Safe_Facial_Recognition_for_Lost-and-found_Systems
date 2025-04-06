@@ -132,9 +132,9 @@ CHILD_SAFE_RECOGNITION_YOLOV8/
 
 ### Prerequisites:
 
-- Python 3.8+
+- Python 3.8+(Python 3.11 is ideal)
 - MySQL Server
-- CUDA-compatible GPU recommended for better performance
+- CUDA-compatible GPU recommended for better performance(If it isn't present, CPU will be taking on the workload).
 
 ### Installation:
 
