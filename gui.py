@@ -1,6 +1,6 @@
 import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
-
+from tkinter import simpledialog, messagebox
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
@@ -10,6 +10,10 @@ import cv2
 from PIL import Image, ImageTk
 import numpy as np
 import sys
+import sqlite3
+from tkinter import ttk
+
+
 
 # Import necessary modules from your project
 from face_detection import detect_faces
@@ -25,10 +29,247 @@ from storage import store_encrypted_image, retrieve_encrypted_image
 from config import IMAGE_STORAGE_PATH
 from notification import notify_guardian_async
 
+import tkinter as tk
+from tkinter import ttk, messagebox
+import sqlite3
+
+import tkinter as tk
+from tkinter import messagebox
+import sqlite3
+
+import tkinter as tk
+from tkinter import messagebox
+import sqlite3
+
+class SignupFrame(tk.Frame):
+    def __init__(self, master, switch_to_login):
+        super().__init__(master, bg="#2c3e50")
+        self.master = master
+        self.switch_to_login = switch_to_login
+
+        # Set master window background to dark
+        self.master.configure(bg="#2c3e50")
+
+        # Fill the entire window
+        self.pack(fill="both", expand=True)
+
+        # Wrapper for centering content
+        content = tk.Frame(self, bg="#2c3e50")
+        content.place(relx=0.5, rely=0.5, anchor="center")
+
+        # Title
+        tk.Label(content,
+                 text="Create New Account",
+                 font=("Helvetica", 18, "bold"),
+                 bg="#2c3e50",
+                 fg="white").grid(row=0, column=0, columnspan=2, pady=(10, 30))
+
+        # Username
+        tk.Label(content, text="Username:", font=("Helvetica", 12), bg="#2c3e50", fg="white")\
+            .grid(row=1, column=0, sticky="e", padx=10, pady=10)
+        self.username_entry = tk.Entry(content, font=("Helvetica", 12), width=25, bg="white", fg="black")
+        self.username_entry.grid(row=1, column=1, padx=10, pady=10)
+
+        # Password
+        tk.Label(content, text="Password:", font=("Helvetica", 12), bg="#2c3e50", fg="white")\
+            .grid(row=2, column=0, sticky="e", padx=10, pady=10)
+        self.password_entry = tk.Entry(content, font=("Helvetica", 12), show="*", width=25, bg="white", fg="black")
+        self.password_entry.grid(row=2, column=1, padx=10, pady=10)
+
+        # Role
+        tk.Label(content, text="Role (Developer / Authority):", font=("Helvetica", 12), bg="#2c3e50", fg="white")\
+            .grid(row=3, column=0, sticky="e", padx=10, pady=10)
+        self.role_entry = tk.Entry(content, font=("Helvetica", 12), width=25, bg="white", fg="black")
+        self.role_entry.grid(row=3, column=1, padx=10, pady=10)
+
+        # Style for buttons
+        style = ttk.Style()
+        style.configure("Signup.TButton",
+                        font=("Arial", 12, "bold"),
+                        foreground="white",
+                        background="#007BFF",
+                        padding=10)
+        style.map("Signup.TButton",
+                  background=[("active", "#0056b3")],
+                  foreground=[("active", "white")])
+
+        # Sign Up button
+        self.signup_button = ttk.Button(content, text="Sign Up", style="Signup.TButton", command=self.create_account)
+        self.signup_button.grid(row=4, column=0, columnspan=2, pady=20)
+
+        # Back to login button
+        self.back_button = ttk.Button(content, text="Back to Login", style="Signup.TButton", command=self.switch_to_login)
+        self.back_button.grid(row=5, column=0, columnspan=2, pady=10)
+
+        # Message label
+        self.message_label = tk.Label(content, text="", font=("Helvetica", 10), fg="red", bg="#2c3e50")
+        self.message_label.grid(row=6, column=0, columnspan=2, pady=5)
+
+
+    def create_account(self):
+        username = self.username_entry.get().strip()
+        password = self.password_entry.get().strip()
+        role = self.role_entry.get().strip().capitalize()
+
+        if not username or not password or role not in ["Developer", "Authority"]:
+            self.message_label.config(text="Please fill all fields correctly.", fg="red")
+            return
+
+        conn = sqlite3.connect("child_safety.db")
+        c = conn.cursor()
+        try:
+            c.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+                      (username, password, role))
+            conn.commit()
+            self.message_label.config(text="Account created successfully!", fg="green")
+        except sqlite3.IntegrityError:
+            self.message_label.config(text="Username already exists.", fg="red")
+        finally:
+            conn.close()
+
+
+class LoginFrame(tk.Frame):
+    def __init__(self, master, on_login_success):
+        super().__init__(master, bg="#2c3e50")  # Dark background
+        self.master = master
+        self.on_login_success = on_login_success
+
+        self.configure(width=900, height=700)
+        self.place(relx=0.5, rely=0.5, anchor="center")
+
+        # Center wrapper
+        content = tk.Frame(self, bg="#2c3e50")
+        content.pack(expand=True)
+
+        # Title
+        tk.Label(content,
+                 text="Child Safety Recognition System Login",
+                 font=("Helvetica", 18, "bold"),
+                 bg="#2c3e50",
+                 fg="white").grid(row=0, column=0, columnspan=2, pady=(10, 30))
+
+        # Username Label
+        tk.Label(content, text="Username:", font=("Helvetica", 12), bg="#2c3e50", fg="white")\
+            .grid(row=1, column=0, sticky="e", padx=10, pady=10)
+        self.username_entry = tk.Entry(content, font=("Helvetica", 12), width=25, bg="white", fg="black")
+        self.username_entry.grid(row=1, column=1, padx=10, pady=10)
+
+        # Password Label
+        tk.Label(content, text="Password:", font=("Helvetica", 12), bg="#2c3e50", fg="white")\
+            .grid(row=2, column=0, sticky="e", padx=10, pady=10)
+        self.password_entry = tk.Entry(content, font=("Helvetica", 12), show="*", width=25, bg="white", fg="black")
+        self.password_entry.grid(row=2, column=1, padx=10, pady=10)
+        
+        style = ttk.Style()
+        style.configure("Login.TButton",
+                        font=("Arial", 12, "bold"),
+                        foreground="white",
+                        background="#007BFF",
+                        padding=10)
+        style.map("Login.TButton",
+                  background=[("active", "#0056b3")],
+                  foreground=[("active", "white")])
+
+        self.login_button = ttk.Button(
+            content,
+            text="Login",
+            style="Login.TButton",
+            command=self.check_credentials
+        )
+
+        self.login_button.grid(row=3, column=0, columnspan=2, pady=20)
+        
+        # Sign Up button (same size, same style)
+        self.signup_button = ttk.Button(
+            content,
+            text="Sign Up",
+            style="Login.TButton",
+            command=self.switch_to_signup
+        )
+        self.signup_button.grid(row=4, column=0, columnspan=2, pady=(0, 20))
+
+        # Message Label
+        self.message_label = tk.Label(content, text="", font=("Helvetica", 10), fg="red", bg="#2c3e50")
+        self.message_label.grid(row=5, column=0, columnspan=2)
+
+    def check_credentials(self):
+        username = self.username_entry.get().strip()
+        password = self.password_entry.get().strip()
+
+        conn = sqlite3.connect("child_safety.db")
+        c = conn.cursor()
+        c.execute("SELECT role FROM users WHERE username=? AND password=?", (username, password))
+        result = c.fetchone()
+        conn.close()
+
+        if result:
+            role = result[0]
+            self.on_login_success(role=role)
+        else:
+            self.message_label.config(text="Invalid credentials!")
+
+    def switch_to_signup(self):
+        self.pack_forget()
+        self.master.signup_frame = SignupFrame(self.master, switch_to_login=self.switch_to_login_from_signup)
+        self.master.signup_frame.pack(fill="both", expand=True)
+
+    def switch_to_login_from_signup(self):
+        self.master.signup_frame.destroy()
+        self.master.login_frame = LoginFrame(self.master, self.on_login_success)
+
+
+
+
+
 class ChildSafetyApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        
+        self.geometry("900x700")
+        self.title("Child Safety Recognition System")
+        # self.configure(bg="#f0f0f0")
+        self.resizable(False, False)  # Optional: Fix window size
+
+        self.initialize_user_db()
+
+        self.role = None  # Will be set after login
+
+        # Set up basic window (can be hidden until login)
+        # self.withdraw()  # Hide main window until login succeeds
+
+        self.login_frame = LoginFrame(self, self.on_login_success)
+        self.login_frame.pack(expand=True, fill="both")      
+
+
+    def initialize_user_db(self):
+        conn = sqlite3.connect("child_safety.db")
+        c = conn.cursor()
+
+        # Create users table if it doesn't exist
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                role TEXT NOT NULL CHECK(role IN ('Developer', 'Authority'))
+            )
+        ''')
+
+        # Add default users only if table is empty
+        c.execute("SELECT COUNT(*) FROM users")
+        if c.fetchone()[0] == 0:
+            c.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", ("admin", "admin123", "Developer"))
+            c.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", ("authority", "auth123", "Authority"))
+
+        conn.commit()
+        conn.close()
+
+    def on_login_success(self, role):
+        self.login_frame.destroy()
+        self.deiconify()
+        self.role = role
+        self.initialize_app_ui()
+
+    def initialize_app_ui(self):
         # Initialize database
         initialize_database()
 
@@ -70,6 +311,108 @@ class ChildSafetyApp(tk.Tk):
         self.webcam_thread = None
         self.current_frame = None
     
+        # # Initialize database
+        # initialize_database()
+
+        # # Check for scheduled cleanup
+        # self.check_for_scheduled_cleanup()
+        
+        # # Configure main window
+        # self.title("Child Safety Recognition System")
+        # self.geometry("900x700")
+        # # self.configure(bg="#2c3e50") 
+
+        # self.configure(bg="#f0f0f0")
+        # # self.resizable(False, False)
+        
+
+        # # # Use modern theme
+        # # self.style = ttk.Style()
+        # # self.style.theme_use("clam")
+        # # self.style.configure("TButton", font=("Segoe UI", 12), padding=6)
+        # # self.style.configure("TLabel", font=("Segoe UI", 12))
+        # # self.style.configure("TEntry", font=("Segoe UI", 12))
+
+        # # # Optionally customize button colors
+        # # self.style.configure("TButton",
+        # #                     background="#007acc",
+        # #                     foreground="white")
+        # # self.style.map("TButton",
+        # #             background=[("active", "#005f99")],
+        # #             foreground=[("active", "white")])
+
+        # # # Create notebook for tabs
+        # # self.notebook = ttk.Notebook(self)
+        # # self.notebook.pack(expand=True, fill="both", padx=20, pady=20)
+        # # # self.notebook.pack(expand=True, fill="both")  
+
+
+        # # # Create tabs with consistent background
+
+        # # # self.style.configure('TNotebook', background='#2c3e50', borderwidth=0)
+        # # # self.style.configure('TNotebook.Tab', background='#34495e', foreground='white', padding=10)
+        # # # self.style.map("TNotebook.Tab",
+        # # #             background=[("selected", "#1abc9c")],
+        # # #             foreground=[("selected", "white")])
+
+        
+        # # self.register_tab = ttk.Frame(self.notebook, padding=20)
+        # # self.identify_tab = ttk.Frame(self.notebook, padding=20)
+        # # self.case_tab = ttk.Frame(self.notebook, padding=20)
+        
+        # # # for tab in (self.register_tab, self.identify_tab, self.case_tab):
+        # # #     tab.configure(style="TFrame")  # Apply uniform styling
+
+        # # self.notebook.add(self.register_tab, text="📝 Register Lost Child")
+        # # self.notebook.add(self.identify_tab, text="🔍 Identify Found Child")
+        # # self.notebook.add(self.case_tab, text="📁 Manage Cases")
+
+        # # # Setup each tab
+        # # self.setup_register_tab()
+        # # self.setup_identify_tab()
+        # # self.setup_case_tab()
+
+        # # self.style.configure("TButton", font=("Segoe UI", 11), padding=6)
+        # # self.style.configure("TLabel", font=("Segoe UI", 11))
+        # # self.style.configure("TEntry", font=("Segoe UI", 11))
+
+        # # # Video capture variables
+        # # self.cap = None
+        # # self.is_webcam_running = False
+        # # self.webcam_thread = None
+        # # self.current_frame = None
+
+        # # Create notebook for tabs
+        # self.notebook = ttk.Notebook(self)
+        # self.notebook.pack(expand=True, fill="both", padx=10, pady=10)
+        
+        # # Create tabs
+        # self.register_tab = ttk.Frame(self.notebook)
+        # self.identify_tab = ttk.Frame(self.notebook)
+        # self.case_tab = ttk.Frame(self.notebook)
+        
+        # self.notebook.add(self.register_tab, text="Register Lost Child")
+        # self.notebook.add(self.identify_tab, text="Identify Found Child")
+        # self.notebook.add(self.case_tab, text="Manage Cases")
+        
+        # # Configure style
+        # self.style = ttk.Style()
+        # self.style.configure("TButton", font=("Arial", 12))
+        # self.style.configure("TLabel", font=("Arial", 12))
+        # self.style.configure("TEntry", font=("Arial", 12))
+        
+        # # Setup tabs
+        # self.setup_register_tab()
+        # self.setup_identify_tab()
+        # self.setup_case_tab()
+        
+        # # Video capture variables
+        # self.cap = None
+        # self.is_webcam_running = False
+        # self.webcam_thread = None
+        # self.current_frame = None
+
+
     def check_for_scheduled_cleanup(self):  
         """Check if monthly cleanup should run"""
         from database import schedule_monthly_cleanup
@@ -127,6 +470,10 @@ class ChildSafetyApp(tk.Tk):
     def manual_cleanup(self):
         """Run manual cleanup of old closed cases"""
         from database import cleanup_closed_cases
+
+        if self.role != "Developer":
+            messagebox.showwarning("Access Denied", "Only developers can perform cleanup.")
+            return
         
         # Ask for confirmation with a custom dialog
         confirm_dialog = tk.Toplevel(self)
@@ -790,7 +1137,7 @@ class ChildSafetyApp(tk.Tk):
         notify_guardian_btn = ttk.Button(identify_frame, text="Notify Guardian", command=self.notify_identified_guardian)
         notify_guardian_btn.pack(side="right", padx=5, pady=5)
 
-        close_case_btn = ttk.Button(identify_frame, text="Close This Case", command=self.close_identified_case)
+        close_case_btn = ttk.Button(identify_frame, text="Close Case", command=self.close_identified_case)
         close_case_btn.pack(side="right", padx=5, pady=5)
         
         # Results frame
@@ -855,69 +1202,64 @@ class ChildSafetyApp(tk.Tk):
         details_frame = ttk.LabelFrame(self.case_tab, text="Case Details")
         details_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
-        # Create a frame with two columns
         details_columns_frame = ttk.Frame(details_frame)
         details_columns_frame.pack(padx=5, pady=5, fill="both", expand=True)
 
-        # Left column for text details
         details_text_frame = ttk.Frame(details_columns_frame)
         details_text_frame.pack(side="left", padx=5, pady=5, fill="both", expand=True)
 
         self.case_details_text = tk.Text(details_text_frame, height=5, width=50)
         self.case_details_text.pack(padx=5, pady=5, fill="both", expand=True)
 
-        # Right column for image
         details_image_frame = ttk.Frame(details_columns_frame)
         details_image_frame.pack(side="right", padx=5, pady=5, fill="both", expand=True)
 
         self.case_details_image = ttk.Label(details_image_frame, text="No image available")
         self.case_details_image.pack(padx=5, pady=5, fill="both", expand=True)
-        
-        # Create admin frame at the bottom
-        admin_frame = ttk.LabelFrame(self.case_tab, text="Administration")
-        admin_frame.pack(padx=10, pady=(5, 10), fill="x")
 
-        # Add cleanup button
-        cleanup_btn = ttk.Button(
-            admin_frame, 
-            text="Clean Up Old Closed Cases", 
-            command=self.manual_cleanup
-        )
-        cleanup_btn.pack(side="right", padx=10, pady=10)
+        # Create admin frame at the bottom — only visible to Developers
+        if self.role == "Developer":
+            admin_frame = ttk.LabelFrame(self.case_tab, text="Administration")
+            admin_frame.pack(padx=10, pady=(5, 10), fill="x")
 
-        # Add help text
-        help_text = "Cases marked as 'Closed' will be automatically deleted at the start of each month"
-        ttk.Label(admin_frame, text=help_text, font=("Arial", 9, "italic")).pack(side="left", padx=10, pady=10)
+            cleanup_btn = ttk.Button(
+                admin_frame, 
+                text="Clean Up Old Closed Cases", 
+                command=self.manual_cleanup
+            )
+            cleanup_btn.pack(side="right", padx=10, pady=10)
 
-        # Add Close Case button to details frame
+            help_text = "Cases marked as 'Closed' will be automatically deleted at the start of each month"
+            ttk.Label(admin_frame, text=help_text, font=("Arial", 9, "italic")).pack(side="left", padx=10, pady=10)
+
+        # Add Close Case and Notify Guardian button — Developer only (can change as needed)
         details_button_frame = ttk.Frame(details_frame)
         details_button_frame.pack(padx=5, pady=5, fill="x")
-        
-        self.close_details_btn = ttk.Button(
-            details_button_frame, 
-            text="Close This Case", 
-            command=self.close_searched_case,
-            state="disabled"  # Initially disabled until a case is found
-        )
-        self.close_details_btn.pack(side="right", padx=5, pady=5)
+
+        if self.role == "Developer":
+            self.close_details_btn = ttk.Button(
+                details_button_frame, 
+                text="Close This Case", 
+                command=self.close_searched_case,
+                state="disabled"
+            )
+            self.close_details_btn.pack(side="right", padx=5, pady=5)
 
         self.notify_guardian_details_btn = ttk.Button(
-        details_button_frame, 
-        text="Notify Guardian", 
-        command=self.notify_case_guardian,
-        state="disabled"  # Initially disabled until a case is found
+            details_button_frame, 
+            text="Notify Guardian", 
+            command=self.notify_case_guardian,
+            state="disabled"
         )
         self.notify_guardian_details_btn.pack(side="right", padx=5, pady=5)
 
-        # Add search filter for open cases
+        # Filter by name
         search_filter_frame = ttk.Frame(self.case_tab)
         search_filter_frame.pack(padx=10, pady=5, fill="x")
 
         ttk.Label(search_filter_frame, text="Search by name:").pack(side="left", padx=5, pady=5)
         self.case_search_entry = ttk.Entry(search_filter_frame, width=30)
         self.case_search_entry.pack(side="left", padx=5, pady=5)
-
-        # Bind Enter key to the search function
         self.case_search_entry.bind("<Return>", lambda event: self.filter_cases())
 
         search_filter_btn = ttk.Button(search_filter_frame, text="Search", command=self.filter_cases)
@@ -926,24 +1268,27 @@ class ChildSafetyApp(tk.Tk):
         clear_filter_btn = ttk.Button(search_filter_frame, text="Clear Filter", command=self.refresh_cases)
         clear_filter_btn.pack(side="left", padx=5, pady=5)
 
-        # Open cases list
+        # Treeview
         cases_frame = ttk.LabelFrame(self.case_tab, text="Open Cases")
         cases_frame.pack(padx=10, pady=10, fill="both", expand=True)
-        
-        # Create treeview for open cases
+
         columns = ("ID", "Name", "Age", "Gender", "Guardian Contact", "Last Known Location")
         self.cases_tree = ttk.Treeview(cases_frame, columns=columns, show="headings")
         
-        # Define headings
         for col in columns:
             self.cases_tree.heading(col, text=col)
             self.cases_tree.column(col, width=100)
-        
+
         self.cases_tree.pack(padx=5, pady=5, fill="both", expand=True)
         self.cases_tree.bind("<Double-1>", self.on_case_selected)
 
+
     def close_searched_case(self):
         """Close the case that was found through search"""
+        # Restrict access for non-developers
+        if self.role != "Developer":
+            messagebox.showwarning("Access Denied", "Only developers can close cases.")
+            return
         try:
             embedding_id = self.embedding_id_entry.get().strip()
             
@@ -989,6 +1334,10 @@ class ChildSafetyApp(tk.Tk):
 
     def close_identified_case(self):
         """Close all identified cases in the identify tab"""
+        # Restrict access for non-developers
+        if self.role != "Developer":
+            messagebox.showwarning("Access Denied", "Only developers can close cases.")
+            return
         try:
             # Get text from results_text to find embedding IDs
             self.results_text.config(state="normal")
