@@ -36,6 +36,7 @@ CHILD_SAFE_RECOGNITION_YOLOV8/
 ├── face_detection.py   # YOLOv8 face detection
 ├── gui.py              # GUI interface
 ├── main.py             # Main application entry point
+├── notification.py     # Real time Whatsapp notification system
 ├── requirements.txt    # Python dependencies
 ├── run.sh              # Shell script launcher
 ├── storage.py          # Image storage management
@@ -94,6 +95,12 @@ CHILD_SAFE_RECOGNITION_YOLOV8/
    - Manages secure image storage and retrieval
    - Coordinates with encryption module for image security
    - Handles file operations for stored images
+  
+9. **notification.py**:
+
+   - Alerts guardians when a child is found, primarily through WhatsApp messages with SMS fallback via Twilio
+   - Ensuring critical messages get delivered
+   - Offers both synchronous and asynchronous notification capabilities, including functions to notify multiple guardians simultaneously for the same child
 
 ### Support Files
 
@@ -122,13 +129,15 @@ CHILD_SAFE_RECOGNITION_YOLOV8/
 4. Search FAISS vector store for similar embeddings
 5. Return potential matches above similarity threshold
 6. Display matching child information if found
-7. Option to close the case if child is correctly identified
+7.  Alerts guardians when a child is found, through WhatsApp messaging
+8. Option to close the case if child is correctly identified
 
 ### Case Management:
 
 1. List all open cases from database
 2. When a child is found, update case status
 3. Clean up vector store and encrypted images as needed
+4. Search by name filter to view particular cases
 
 ## Setup Instructions
 
