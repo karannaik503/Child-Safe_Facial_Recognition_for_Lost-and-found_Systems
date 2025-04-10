@@ -11,6 +11,8 @@ This application provides tools to register missing children, identify them from
 - FAISS vector store for fast similarity searching
 - AES encryption for secure image storage
 - MySQL database for storing child metadata
+- PyWhatKit library to automate sending WhatsApp messages through web.whatsapp.com
+- Multithreading, using Python's threading module to send notifications asynchronously without blocking the main application
 
 ## Directory Structure
 
